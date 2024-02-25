@@ -1,0 +1,89 @@
+import sys
+import os
+
+
+def clear_screen():
+    if sys.platform.startswith('win'):
+        os.system('cls')
+    else:
+        os.system('clear')
+
+
+def create_board(rows, cols):
+    board = [[' ' for _ in range(cols)] for _ in range(rows)]
+    return board
+
+
+def print_board(board):
+    for row in board:
+        row_str = "|".join(row)
+        row_str = row_str.replace('X', '\x1b[31mX\x1b[0m')  # Red 'X'
+        row_str = row_str.replace('O', '\x1b[34mO\x1b[0m')  # Blue 'O'
+        print(row_str)
+        print("-" * len(row))
+    print("1 2 3 4 5 6 7")
+
+
+def is_valid_move(board, col):
+    return col >= 0 and col < len(board[0]) and board[0][col] == ' '
+
+
+def make_move(board, col, player):
+    for row in range(len(board) - 1, -1, -1):
+        if board[row][col] == ' ':
+            board[row][col] = player
+            return row, col
+
+
+def check_win(board, row, col):
+    directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
+    for dr, dc in directions:
+        count = 1
+        for i in range(1, 4):
+            r, c = row + i * dr, col + i * dc
+            if 0 <= r < len(board) and 0 <= c < len(board[0]) and board[r][c] == board[row][col]:
+                count += 1
+            else:
+                break
+        for i in range(1, 4):
+            r, c = row - i * dr, col - i * dc
+            if 0 <= r < len(board) and 0 <= c < len(board[0]) and board[r][c] == board[row][col]:
+                count += 1
+            else:
+                break
+        if count >= 4:
+            return True
+    return False
+
+
+def main():
+    rows, cols = 6, 7
+    player = 'X'
+    board = create_board(rows, cols)
+    print("Welcome to Connect Four!")
+
+    while True:
+        clear_screen()
+        print_board(board)
+        col = int(input(f"Player {player}, choose a column (1-7): ")) - 1
+
+        if is_valid_move(board, col):
+            row, col = make_move(board, col, player)
+
+            if check_win(board, row, col):
+                clear_screen()
+                print_board(board)
+                print(f"\x1b[31mPlayer {player} wins!\x1b[0m")  # Red text for the winning player
+                break
+
+            if ' ' not in board[0]:
+                clear_screen()
+                print_board(board)
+                print("It's a draw!")
+                break
+
+            player = 'O' if player == 'X' else 'X'
+
+
+if __name__ == "__main__":
+    main()
