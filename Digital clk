@@ -1,0 +1,20 @@
+from tkinter import *
+import time
+
+root = Tk()
+root.title('Digital Clock')
+root.geometry('800x500')
+
+
+def update_time():
+    current_time = time.strftime('%H:%M:%S %p')
+    label.config(text=current_time)
+    root.after(1000, update_time)
+
+label = Label(root, font=('blue', 80), background='white', foreground='lime')
+label.pack(pady=50)
+
+update_time()
+
+
+root.mainloop()
